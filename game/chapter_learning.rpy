@@ -61,6 +61,7 @@ z "But you're almost there. Find a soldier in  /description/."
 z "What you need to do is touch them with nobody noticing."
 z "And then you'll be free."
 z "So, words."
+# слово Bowl автоматически должно выдаваться первым и может даже как-то прям отмечаться
 
 # после например 10-15 смерти
 z "Oh, you look annoyed."

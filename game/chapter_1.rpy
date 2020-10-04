@@ -1,6 +1,5 @@
 ﻿define a = Character("Security A")
 define b = Character("Security B")
-define c = Character("Security C")
 
 label start:
 
@@ -22,7 +21,7 @@ a "You should say something!"
 
 menu:
   "I can't understand you":
-    jump you_died_startr_1
+    jump you_died_1
   "...":
     jump you_suspicious_start_2
   "Hail!": # только если слово изучено уже
@@ -45,6 +44,8 @@ menu:
 
 label you_died_1:
 # Здесь ребята сменят аватары, изображение типа бам, экран "You died" и прыгаем в Пост-смерть
+"I'm dead."
+jump word_learning
 
 label correct_1:
 # Возможно можно в зависимости от уровня подозрения, добавить после первого: 
@@ -56,7 +57,7 @@ label correct_1:
 
 a "Ok, our funniest route for today, let's go."
 b "Not until we revise regulations."
-a "They are the same every time, no need to revise them every time we go in there."
+a "They are the same, no need to revise them every time we go in there."
 b "If you want to die – of course, not."
 b "Maybe you even want to go alone?"
 
@@ -124,7 +125,7 @@ menu:
 
 b "We're already late. I want to eat on a lunch break, and not stand in the queue."
 a "Ugh, right."
-a "That one funniest regulation which doesn't allow us to bring our food here."
+a "That stupid regulation which doesn't allow us to bring our food here."
 b "Stop whining, you're annoying."
 b "You'll get used to it, eventually."
 
