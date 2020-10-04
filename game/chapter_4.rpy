@@ -15,8 +15,8 @@ menu:
   "What, again?":
     jump you_died_5
   "Bowl.":
-  # только после того, как выучим
-  jump canteen
+    # только после того, как выучим
+    jump canteen
 
 label canteen:
 a "I can't see our friend over there, hm."
@@ -61,7 +61,8 @@ a "I'll go get food for us, you find a table."
 
 # А уходит, появляется С
 
-menu "So, what should I do?":
+menu: 
+  "So, what should I do?"
   "Go and just touch him.":
     c "Hey, what do you think you're doing?"
     jump you_died_5

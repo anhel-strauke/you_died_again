@@ -15,6 +15,7 @@ a "But you made us stop before everything started happening."
 menu:
   "...":
     # добавляется подозрение
+    pass
   "A good habit.":
     # удаляется подозрение
     a "Ha, right!"

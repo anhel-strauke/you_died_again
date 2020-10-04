@@ -1,5 +1,5 @@
-﻿define a = Character("Security A")
-define b = Character("Security B")
+﻿define a = Character("Security A", kind=foreigner)
+define b = Character("Security B", kind=foreigner)
 
 label start:
 
@@ -11,7 +11,7 @@ menu:
     jump you_died_1
   "...":
     jump you_suspicious_start_1
-  "Hail!": # только если слово изучено уже
+  "Hail!" if word_is_known("hail"): # только если слово изучено уже
     jump correct_1
 
 label you_suspicious_start_1:
@@ -24,7 +24,7 @@ menu:
     jump you_died_1
   "...":
     jump you_suspicious_start_2
-  "Hail!": # только если слово изучено уже
+  "Hail!" if word_is_known("hail"): # только если слово изучено уже
     jump correct_1
 
 label you_suspicious_start_2:
@@ -39,7 +39,7 @@ menu:
   "...":
 # возможно баллы подозрения лучше добавлять после вот этих пустых ответов
     jump you_died_1
-  "Hail!": # только если слово изучено уже
+  "Hail!" if word_is_known("hail"): # только если слово изучено уже
     jump correct_1
 
 label you_died_1:
