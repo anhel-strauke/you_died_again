@@ -1,9 +1,13 @@
 ﻿define a = Character("Security A", kind=foreigner)
 define b = Character("Security B", kind=foreigner)
 
+default died_already = False
+default died_from_susp_already = False
+default died_twice_already = False
+
 label start:
 
-$ susp = 0
+$ reset_susp() # Сбрасываем подозрение в ноль
 
 a "Hail!"
 b "Hail!"
@@ -12,14 +16,14 @@ menu:
   "What?": # язык игрока
     jump you_died_1
   "...":
-    $ susp += 1
     a "Huh, why don't you say anything?"
     a "You should say something!"
+    $ add_susp_or_jump("you_died_1") # Подозрение растёт
     menu:
       "I can't understand you": # язык игрока
         jump you_died_1
       "...":
-        $ susp += 1
+        $ add_susp_or_jump("you_died_1") # Подозрение растёт
         b "You know, it doesn't seem you understand us, huh."
         a "Just say \"Hail\" and let's just move on, please."
         a "I just want to go on with our route."
@@ -29,10 +33,10 @@ menu:
           "...":
             jump you_died_1
           "Hail!" if word_is_known("hail"): # только если слово изучено уже
-            $ susp -= 1
+            $ reduce_susp() # Подозрение уменьшается
             jump correct_1
       "Hail!" if word_is_known("hail"): # только если слово изучено уже
-        $ susp -= 1
+        $ reduce_susp() # Подозрение уменьшается
         jump correct_1
   "Hail!" if word_is_known("hail"): # только если слово изучено уже
     jump correct_1
@@ -54,15 +58,12 @@ b "Maybe you even want to go alone?"
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_1
-    else:
-      pass
+    $ add_susp_or_jump("you_died_1")
   "That's my chance to die again.": # язык игрока
     jump you_died_1
-  "Regulations are important" if word_is_known("regulation", "be", "important"):
+  "Regulations are important" if word_is_known("regulations", "are", "important"):
     b "See."
+    $ reduce_susp()
     # is susp > 0:
    #   $ susp -= 1
    # else susp = 0:
@@ -78,18 +79,15 @@ b "Not only we should go inside only in odd numbers, but also more than two."
 b "Neither stay back or leap forward for more than one meter."
 b "But also make sure to not touch one another or me."
 
-menu:
-# появляется только если слова из третьего известны
-  "...":
-    $ susp += 1
-    if susp == 3:
+if word_is_known("got", "it"):
+  menu:
+  # появляется только если слова из третьего известны
+    "...":
+      $ add_susp_or_jump("you_died_1")
+    "Fascinating.": # язык игрока
       jump you_died_1
-    else:
+    "Got it.":
       pass
-  "Fascinating.": # язык игрока
-    jump you_died_1
-  "Got it.":
-    pass
 
 b "We also should always talk to each other."
 a "Talking would be less unbearable if either of you two was even remotely fun to be around."
@@ -97,14 +95,11 @@ b "I'll smack you."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_1
-    else:
-      pass
+    $ add_susp_or_jump("you_died_1")
   "That's sort of too much.": # язык игрока
     jump you_died_1
-  "You aren't fun either."
+  "You aren't fun either." if word_is_known("you", "fun", "either"):
+    $ reduce_susp()
   # после него продолжается дальше диалог, подозрение падает.
 
 a "Hey, don't be mean!"
@@ -116,14 +111,13 @@ menu:
   "...":
   # неожиданно, но в этот раз, ничего не падает.
     pass
-  "And now we're dead.":
-  # подозрение падает.
+  "And now we're dead." if word_is_known("now", "we", "dead"):
     a "Ha, you're right."
     b "No, we don't die because we're silent."
     b "That's different regulation altogether."
     a "Eh, because of the ability of that inmate?"
     b "Mhm."
-    pass
+    $ reduce_susp() # подозрение падает.
   "Silence was so good.": # язык игрока
     jump you_died_1
 
@@ -135,15 +129,11 @@ b "You'll get used to it, eventually."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_1
-    else:
-      pass
+    $ add_susp_or_jump("you_died_1")
     b "Hm..."
   "I wonder what's behind that door.": # язык игрока
      jump you_died_1
-  "The food they make is ok.":
+  "The food they make is ok." if word_is_known("food", "make"):
     a "Your definition of ok is a very low quality."
     a "I should treat you to something good to raise your standards."
     pass
@@ -156,8 +146,15 @@ jump chapter_2
 label you_died_1:
 # Здесь ребята сменят аватары
 "I'm dead."
-jump word_learning
-# здесь нужно сделать так. в первый раз игра прыгает на word_learning_1 (1 раз)
-# если смерть от высокого подозрения word_learning_susp (1 раз)
-# если смерть после word_learning_1 еоторая не susp word_learning_sc1 (1 раз)
-# все остальные после - word_learning
+
+if not died_already: # здесь нужно сделать так. в первый раз игра прыгает на word_learning_1 (1 раз)
+  $ died_already = True
+  jump word_learning_1
+elif SUSP >= SUSP_LIMIT and not died_from_susp_already: # если смерть от высокого подозрения word_learning_susp (1 раз)
+  $ died_from_susp_already = True
+  jump word_learning_susp
+elif SUSP < SUSP_LIMIT and not died_twice_already: # если смерть после word_learning_1 еоторая не susp word_learning_sc1 (1 раз)
+  $ died_twice_already = True
+  jump word_learning_sc1
+else: # все остальные после - word_learning
+  jump word_learning

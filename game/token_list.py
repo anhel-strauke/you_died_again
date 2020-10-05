@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 KNOWN_WORD_MODIFIER = 100000
-REPLACEMENT_CHAR = u"\u2588"
+REPLACEMENT_CHAR = u"\u2588" # It's a block character
 
 class Token(object):
     STATE_INVISIBLE = 0
