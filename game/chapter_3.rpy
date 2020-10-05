@@ -14,8 +14,11 @@ a "But you made us stop before everything started happening."
 
 menu:
   "...":
-    # добавляется подозрение
-    pass
+    $ susp += 1
+    if susp == 3:
+      jump you_died_1_1
+    else:
+      pass
   "A good habit.":
     # удаляется подозрение
     a "Ha, right!"
@@ -30,8 +33,8 @@ menu:
     a "That would be great."
     a "Don't want to die single."
     b "You'll find a person you like eventually."
-  "We're back.":
-    jump you_died_1
+  "We're back.": # язык игрока
+    jump you_died_1_1
 
 
 # ХВАТИТ МНЕ ЭТО В МЕНЮ ОБЪЕДИНЯТЬ
@@ -42,10 +45,15 @@ a "And you? Wanna make a detour with me or go eat?"
 
 menu:
   "...":
-    jump you_died_1
+    $ susp += 1
+    if susp == 3:
+      jump you_died_1_1
+    else:
+      pass
   "Go straight to eat.":
     b "We'll get you place."
     a "Yeah, thanks."
+    jump go_with_b
   "Go to the toilet.":
     a "No need to call it that."
     b "But that's what it's called."
@@ -54,7 +62,7 @@ menu:
     a "Let's go."
     jump go_with_a
   "Where's canteen?":
-    jump you_died_1
+    jump you_died_1_1
 #
 
 label go_with_b:
@@ -67,8 +75,11 @@ b "So see you in the canteen."
 
 menu:
   "...":
-    # подозрение растёт
-    pass
+    $ susp += 1
+    if susp == 3:
+      jump you_died_3
+    else:
+      pass
   "Where's canteen?":
     jump you_died_3
   "I can go with you.":
@@ -93,15 +104,18 @@ a "And you aren't better."
 
 menu:
   "...":
-    # добавить подозрение
-    a "Silent again, really?"
-    pass
+    $ susp += 1
+    if susp == 3:
+      jump you_died_4
+    else:
+      a "Silent again, really?"
+      pass
   "She's fun":
     a "That's your type of person?"
     a "Really?"
     a "You break my heart."
     pass
-  "I'm already tired.":
+  "I'm already tired.": # язык игрока
     jump you_died_4
 
 a "Oh, look, there's someone else already."
@@ -121,11 +135,10 @@ v "I'm impressed you've made it this far, you know?"
 menu:
   "...":
     pass
-  "Who are you?":
-    v "The last thing you'll see."
-    v "Only if your master won't fetch you."
+  "Who are you?": # язык игрока
+    v "The last thing you'll see if your master won't fetch you."
     jump you_died_monster_thing_2
-  "Show yourself.":
+  "Show yourself.": # язык игрока
     v "Gladly."
     jump you_died_monster_thing_2
 
@@ -136,19 +149,30 @@ a "You really need to eat. Let's go."
 
 jump chapter_4
 
+label you_died_1_1:
+# Здесь ребята сменят аватары
+"I'm dead."
+jump word_learning
+# отличие от предыдущего из-за того, что оно в первые раз должно вести на word_learning_sc3
+# потом word_learning
+
 label you_died_3:
 b "..."
 # Охранница на фоне коридора застреливает
 "I'm dead."
 jump word_learning
+# если вдруг не умер на 1_1, то нужно, чтобы сработало word_learning_sc3
+# остальное word_learning
 
 label you_died_4:
 a "Ugh."
 # Охранник пристреливает
 "I'm dead."
 jump word_learning
+# если вдруг не умер на 1_1, то нужно, чтобы сработало word_learning_sc3
+# остальное word_learning
 
 label you_died_monster_thing_2:
 # изображение ебаки
 "I really shouldn't trust voices in my head."
-jump word_learning
+jump monster_2

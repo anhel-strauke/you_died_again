@@ -15,12 +15,16 @@ menu:
   "I'm single.":
     pass
   # один из этих результатов рандомом выдаёт или продолжение, или геймовер.
-  "The fun thing is…":
+  "The fun thing is…": # язык игрока
     jump you_died_2
   "...":
-  # если подозрение больше 3, you_died_2, если нет добавляется подозрение.
-    a "Hey, lost in thoughts?"
-    b "Don't be silent."
+    $ susp += 1
+    if susp == 3:
+      jump you_died_2
+    else:
+      a "Hey, lost in thoughts?"
+      b "Don't be silent."
+      pass
     menu:
       "Kids and spouse are ok.":
         b "Good to hear."
@@ -29,7 +33,7 @@ menu:
         a "Ah, right."
         pass
       # один из этих результатов рандомом выдаёт или продолжение, или геймовер.
-      "The fun thing is…":
+      "The fun thing is…": # язык игрока
         jump you_died_2
       "...":
         jump you_died_2
@@ -49,7 +53,7 @@ a "..."
 b "..."
 
 menu:
-  "What's going on?":
+  "What's going on?": # язык игрока
     jump you_died_monster_thing_1
   "...":
     pass
@@ -66,11 +70,14 @@ a "Well, of corse not, but..."
 
 menu:
   "...":
-    # добавляется подозрение
-    pass
+    $ susp += 1
+    if susp == 3:
+      jump you_died_2
+    else:
+      pass
   "But what?":
     pass
-  "What was that?":
+  "What was that?": # язык игрока
     jump you_died_2
 
 a "It's really impossible to just go to the toilet."
@@ -88,9 +95,12 @@ menu:
     a "No, of course not."
     b "See."
   "...":
-    # добавляется подозрение
-    pass
-  "Really?":
+    $ susp += 1
+    if susp == 3:
+      jump you_died_2
+    else:
+      pass
+  "Really?": # язык игрока
     jump you_died_2
 
 a "What is worse, to die instantly because you went against regulations, or to have some curse on you?"
@@ -102,8 +112,11 @@ b "Or even impose it on your closest ones."
 
 menu:
   "...":
-    # добавляется подозрение
-    pass
+    $ susp += 1
+    if susp == 3:
+      jump you_died_2
+    else:
+      pass
   "Death is good.":
     b "Why do you sound like you know how it feels?"
     a "You're looking too much into it."
@@ -123,7 +136,7 @@ menu:
     a "It depends on a curse, I guess."
     b "Mhm."
     pass
-  "I don't like that conversation.":
+  "I don't like that conversation.": # язык игрока
     jump you_died_2
 
 a "Finally, a door."
@@ -134,15 +147,16 @@ a "Right."
 jump chapter_3
 
 label you_died_2:
-# активируется если подозрение выше 5
 a "..."
 b "..."
 # меняется на картинку камеры фон, персонажи стреляют
 "I'm dead."
 jump word_learning
+# после первой смерти word_learning_sc2
+# затем снова на обучное word_learning
 
 label you_died_monster_thing_1:
 a "Fuck."
 # изображение ебаки, и по бокам товарищи а и б
 "We're dead."
-jump word_learning
+jump monster_1

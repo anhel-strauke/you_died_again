@@ -3,49 +3,40 @@ define b = Character("Security B", kind=foreigner)
 
 label start:
 
+$ susp = 0
+
 a "Hail!"
 b "Hail!"
 
 menu:
-  "What?":
+  "What?": # язык игрока
     jump you_died_1
   "...":
-    jump you_suspicious_start_1
+    $ susp += 1
+    a "Huh, why don't you say anything?"
+    a "You should say something!"
+    menu:
+      "I can't understand you": # язык игрока
+        jump you_died_1
+      "...":
+        $ susp += 1
+        b "You know, it doesn't seem you understand us, huh."
+        a "Just say \"Hail\" and let's just move on, please."
+        a "I just want to go on with our route."
+        menu:
+          "What the hell...": # язык игрока
+            jump you_died_1
+          "...":
+            jump you_died_1
+          "Hail!" if word_is_known("hail"): # только если слово изучено уже
+            $ susp -= 1
+            jump correct_1
+      "Hail!" if word_is_known("hail"): # только если слово изучено уже
+        $ susp -= 1
+        jump correct_1
   "Hail!" if word_is_known("hail"): # только если слово изучено уже
     jump correct_1
 
-label you_suspicious_start_1:
-# добавляется балл подозрения
-a "Huh, why don't you say anything?"
-a "You should say something!"
-
-menu:
-  "I can't understand you":
-    jump you_died_1
-  "...":
-    jump you_suspicious_start_2
-  "Hail!" if word_is_known("hail"): # только если слово изучено уже
-    jump correct_1
-
-label you_suspicious_start_2:
-# больше подозрений, йей
-b "You know, it doesn't seem you understand us, huh."
-a "Just say \"Hail\" and let's just move on, please."
-a "I just want to go on with our route."
-
-menu:
-  "What the hell...":
-    jump you_died_1
-  "...":
-# возможно баллы подозрения лучше добавлять после вот этих пустых ответов
-    jump you_died_1
-  "Hail!" if word_is_known("hail"): # только если слово изучено уже
-    jump correct_1
-
-label you_died_1:
-# Здесь ребята сменят аватары, изображение типа бам, экран "You died" и прыгаем в Пост-смерть
-"I'm dead."
-jump word_learning
 
 label correct_1:
 # Возможно можно в зависимости от уровня подозрения, добавить после первого: 
@@ -63,12 +54,20 @@ b "Maybe you even want to go alone?"
 
 menu:
   "...":
-  # поднимается подозрение, но в остальном – прыгаем дальше по сюжету. если оно больше трёх,
+    $ susp += 1
+    if susp == 3:
+      jump you_died_1
+    else:
+      pass
+  "That's my chance to die again.": # язык игрока
     jump you_died_1
-  "That's my chance to die again.":
-    jump word_learning
-  "Regulations are very important":
+  "Regulations are important" if word_is_known("regulation", "be", "important"):
     b "See."
+    # is susp > 0:
+   #   $ susp -= 1
+   # else susp = 0:
+    #  pass
+    
   # только после того, как все эти слова будут изучены. Минус к подозрению. продолжается как обычно
 
 a "Ugh, whatever."
@@ -82,14 +81,15 @@ b "But also make sure to not touch one another or me."
 menu:
 # появляется только если слова из третьего известны
   "...":
-  # поднимается подозрение, но в остальном – прыгаем дальше по сюжету. если оно больше трёх,
-    jump you_died_1
-  "Fascinating.":
-  # может иногда впихивать это, типа оно будет отправлять обратно.
+    $ susp += 1
+    if susp == 3:
+      jump you_died_1
+    else:
+      pass
+  "Fascinating.": # язык игрока
     jump you_died_1
   "Got it.":
     pass
-  # никаких изменений.
 
 b "We also should always talk to each other."
 a "Talking would be less unbearable if either of you two was even remotely fun to be around."
@@ -97,10 +97,13 @@ b "I'll smack you."
 
 menu:
   "...":
-  # поднимаем подозрение. если оно больше трёх, 
+    $ susp += 1
+    if susp == 3:
+      jump you_died_1
+    else:
+      pass
+  "That's sort of too much.": # язык игрока
     jump you_died_1
-  "That's sort of too much.":
-     jump you_died_1
   "You aren't fun either."
   # после него продолжается дальше диалог, подозрение падает.
 
@@ -120,7 +123,8 @@ menu:
     b "That's different regulation altogether."
     a "Eh, because of the ability of that inmate?"
     b "Mhm."
-  "Silence was so too good.":
+    pass
+  "Silence was so good.": # язык игрока
     jump you_died_1
 
 b "We're already late. I want to eat on a lunch break, and not stand in the queue."
@@ -131,15 +135,29 @@ b "You'll get used to it, eventually."
 
 menu:
   "...":
-  # поднимаем подозрение. если оно больше трёх,
-    jump you_died_1
-  "I wonder what's behind that door.":
+    $ susp += 1
+    if susp == 3:
+      jump you_died_1
+    else:
+      pass
+    b "Hm..."
+  "I wonder what's behind that door.": # язык игрока
      jump you_died_1
   "The food they make is ok.":
     a "Your definition of ok is a very low quality."
     a "I should treat you to something good to raise your standards."
-  # после него продолжается дальше диалог, подозрение падает.
+    pass
 
 b "We're coming in."
 
 jump chapter_2
+
+
+label you_died_1:
+# Здесь ребята сменят аватары
+"I'm dead."
+jump word_learning
+# здесь нужно сделать так. в первый раз игра прыгает на word_learning_1 (1 раз)
+# если смерть от высокого подозрения word_learning_susp (1 раз)
+# если смерть после word_learning_1 еоторая не susp word_learning_sc1 (1 раз)
+# все остальные после - word_learning
