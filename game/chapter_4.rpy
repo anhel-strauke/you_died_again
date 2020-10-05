@@ -1,4 +1,9 @@
-﻿define c = Character("Officer", kind=foreigner)
+﻿default seen_ch4 = False
+default touch_him = False
+default punch_him = False
+default touch_biceps = False
+
+define c = Character("Officer", kind=foreigner)
 define d = Character("Some Security", kind=foreigner)
 define m = Character("Security A")
 define l = Character("Security B")
@@ -16,7 +21,7 @@ menu:
     jump you_died_5
   "What, again?": # язык игрока
     jump you_died_5
-  "Bowl.":
+  "Bowl." if word_is_known("bowl"):
     # только после того, как выучим
     jump canteen
 
@@ -26,20 +31,16 @@ a "That's weird."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_5
-    else:
-      a "No reaction aganin?"
-      a "You're somehow off, you know that?"
-      a "Whatever."
-      pass
+    $ add_susp_or_jump("you_died_5")
+    a "No reaction aganin?"
+    a "You're somehow off, you know that?"
+    a "Whatever."
   "That's what?": # язык игрока
     jump you_died_5
-  "Report on Dark Jumper":
+  "Report on the Dark Jumper" if word_is_known("report", "dark", "jumper"):
     # открывается только если мы с ней один раз сходили
     a "Ah, right. I forgot about that."
-    pass
+    $ reduce_susp()
 
 a "But Officer Whatshispants is here."
 # показывается спрайт нужного нам на прикосновение персонажа
@@ -50,18 +51,12 @@ a "I guess, that's what happens after you only do paperwork."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_2
-    else:
-      a "He doesn't hear us, so you can at least support me."
-      pass
-  "Right.":
-    # подозрение -
+    $ add_susp_or_jump("you_died_5")
+  "Right." if word_is_known("right"):
+    $ reduce_susp()
     a "What, no jokes on his behalf?"
     a "But there are jokes on mine."
     a "You're a good friend."
-    pass
   "I hope it's almost over.": # язык игрока
     jump you_died_5
 
@@ -73,12 +68,14 @@ menu:
   "So, what should I do?"
   "Go and just touch him.": # язык игрока
     c "Hey, what do you think you're doing?"
+    $ touch_him = True
     jump you_died_5
   "Punch him.": # язык игрока
     c "What the actual hell?"
     c "Do you want to get fired?"
     d "Officer, he touched..."
     c "Execute him!"
+    $ punch_him = True
     jump you_died_5
   "Go to the free table behind him.": # язык игрока
     # начинается шрифтом слов
@@ -88,12 +85,12 @@ menu:
     # шрифт норм новеллы
     "So, now what?"
     pass
-  "Ask to touch his biceps.": # язык игрока
-    # единственный вариант, доступный после изучения слов "бицепс" и "тач"
+  "Ask to touch his biceps." if word_is_known("touch", "biceps"): # язык игрока
     c "Are you stupid or what?"
     c "That's prohibited."
     c "And you work here for awhile, so you sure has that inmate on you."
     c "Execure him."
+    $ touch_biceps = True
     jump you_died_5
 
 a "Ah, you've got a nice table here."
@@ -146,8 +143,13 @@ m "Eat for now. It's over anyway."
 return 
 
 label ending_2:
-
-"character doesn't tell anything, and officer doesn't die, and they just talk."
+"Is it over now?"
+"If I tell someone, they'll shoot me."
+"So I better keep silent."
+"And the Officer seems fine."
+"I don't want to check if I'll be revived."
+"I've died enough times for today."
+"And for my life."
 
 "Ending two: better keep silent."
 
@@ -158,6 +160,20 @@ label you_died_5:
 # А достаёт пушку
 v "Really, right in front of my salad?"
 "I'm dead."
+
+if not seen_ch4:
+  $ seen_ch4 = True
+  jump word_learning_sc4
+elif touch_him:
+  jump touchy_words
+elif punch_him:
+  jump punchy_words
+elif touch_biceps:
+  jump biceps_words
+else: 
+  jump word_learning
+  
+  
 jump word_learning
 # в первый раз прыгает на word_learning_sc4
 # потом обычное word_learning

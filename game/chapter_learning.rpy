@@ -11,14 +11,16 @@ z "What you need to know is that you'll get back to them."
 z "You want to survive, right?"
 z "Everyone wants to, so."
 z "You can call me Stain if you want to."
-z "I'll translate words for you, but only [n] in one go."
+z "I'll translate words for you, but only a few in one go."
 z "We'll see each other pretty often from now on."
 jump bye_bye
 # запускаем экран с выбором слов. я оставила [n] слов, потому что нужно будет побалансить, плюс, возможно, переписать диалог так, чтобы больше слов повторялось.
 # как вариант, можно после каждой сцены увеличивать это n для прохождения, но надо смотреть
 
 label word_learning:
-# стандартный экран приветствия, не считая первого и отдельно прописанных случаев
+
+$ add_tired_or_jump("tired_of_dying")
+
 z "Hey there, welcome back."
 z "Choose words you'd like to learn." # возможно упустить стоит, так как оч много раз повторение даже двух подряд такое себе, а игрок будет испытывать раздражение
 jump bye_bye
@@ -69,7 +71,7 @@ jump bye_bye
 label word_learning_sc4:
 # четвёртая сцена
 z "Yes, they do have a lot of code words for each location, that isn't that nice of them."
-z "But you're almost there. Find a soldier in  /description/."
+z "But you're almost there. Find an Officer."
 z "What you need to do is touch them with nobody noticing."
 z "And then you'll be free."
 z "So, words."
@@ -81,6 +83,7 @@ label tired_of_dying:
 z "Oh, you look annoyed."
 z "Aren't you happy to see me again?"
 z "Please, don't answer that."
+$ reset_tired()
 jump bye_bye
 
 
@@ -99,4 +102,35 @@ z "Ignore it."
 z "..."
 z "Listen, it's not your concern anyway."
 z "Let's just move on with learning."
+jump bye_bye
+
+
+label touchy_words:
+z "You know, that's getting out of hands."
+z "Can you be even less discreet I wonder?"
+$ touch_him = False
+jump bye_bye
+
+label punchy_words:
+z "Ok, that was fun."
+z "Have you seen his face?"
+z "Hillarious."
+z "But still, be more discreet, please."
+$ punch_him = False
+jump bye_bye
+
+
+label biceps_words:
+z "Well, congratulation on finding this option, I guess."
+z "But I really doubt it would be nice touching him."
+z "Though who knows."
+z "Not me."
+$ touch_biceps = False
+jump bye_bye
+
+
+label skip_words:
+z "Just so you know, you don't have to always listen through the whole thing again and again."
+z "Skip will allow you to fastforward."
+z "And if you forgot what happened - tough luck."
 jump bye_bye

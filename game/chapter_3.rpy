@@ -1,4 +1,6 @@
-﻿define v = Character("???")
+﻿default seen_ch3 = False
+
+define v = Character("???")
 
 label chapter_3:
 
@@ -14,21 +16,16 @@ a "But you made us stop before everything started happening."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_1_1
-    else:
-      pass
-  "A good habit.":
-    # удаляется подозрение
+    $ add_susp_or_jump("you_died_1_1")
+  "A good habit." if word_is_known("good", "habit"):
+    $ reduce_susp()
     a "Ha, right!"
     b "I just want to survive long enough to retire with a good pension."
     a "So materialistic."
     b "I have kids to feed and dress."
     b "And go back home to."
     a "Right."
-    pass 
-  "I'm also impressed.":
+  "I'm also impressed." if word_is_known("impressed", "also"):
     b "I can teach both of you later."
     a "That would be great."
     a "Don't want to die single."
@@ -45,23 +42,32 @@ a "And you? Wanna make a detour with me or go eat?"
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_1_1
-    else:
-      pass
-  "Go straight to eat.":
+    a "Hey, are you ok?"
+    $ add_susp_or_jump("you_died_1_1") # здесь должно запускаться меню кроме добавления подозрения
+#      menu:
+#        "...":
+#          jump you_died_1_1
+#        "Her.":
+#          $ add_susp_or_jump("you_died_1_1")
+#          b "That was really weird say to choose."
+#          jump go_with_b
+#        "Him."
+#          $ add_susp_or_jump("you_died_1_1")
+#          a "Ugh, you're really off."
+#          a "So hungry, huh."
+#          jump go_with_a
+  "Go straight to eat."  if word_is_known("straight"):
     b "We'll get you place."
     a "Yeah, thanks."
     jump go_with_b
-  "Go to the toilet.":
+  "Go to the toilet." if word_is_known("toilet", "detour"):
     a "No need to call it that."
     b "But that's what it's called."
     b "Or what, suddenly wanted to call it detour?"
     a "Whatever."
     a "Let's go."
     jump go_with_a
-  "Where's canteen?":
+  "Where's canteen?"  if word_is_known("canteen"):
     jump you_died_1_1
 #
 
@@ -75,17 +81,12 @@ b "So see you in the canteen."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_3
-    else:
-      pass
-  "Where's canteen?":
+    $ add_susp_or_jump("you_died_3")
+  "Where's canteen?" if word_is_known("canteen"):
     jump you_died_3
-  "I can go with you.":
+  "I can go with you." if word_is_known("can", "go"):
     b "No need, I'll make an actual detour."
     b "It won't take me long, but it would be nice to have a table for us already."
-    pass
 
 b "..."
 b "Hey, why are you silent? And just stand there?"
@@ -104,17 +105,12 @@ a "And you aren't better."
 
 menu:
   "...":
-    $ susp += 1
-    if susp == 3:
-      jump you_died_4
-    else:
-      a "Silent again, really?"
-      pass
-  "She's fun":
+    $ add_susp_or_jump("you_died_4")
+  "She's fun"  if word_is_known("fun"):
     a "That's your type of person?"
     a "Really?"
     a "You break my heart."
-    pass
+    $ reduce_susp()
   "I'm already tired.": # язык игрока
     jump you_died_4
 
@@ -152,9 +148,13 @@ jump chapter_4
 label you_died_1_1:
 # Здесь ребята сменят аватары
 "I'm dead."
-jump word_learning
-# отличие от предыдущего из-за того, что оно в первые раз должно вести на word_learning_sc3
-# потом word_learning
+
+if not seen_ch3:
+  $ seen_ch3 = True
+  jump word_learning_sc3
+else: 
+  jump word_learning
+
 
 label you_died_3:
 b "..."

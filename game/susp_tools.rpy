@@ -18,3 +18,19 @@ init -1 python:
     def reset_susp():
         global SUSP
         SUSP = 0
+
+
+init -1:
+    default TIRED = 0
+    default TIRED_LIMIT = 14
+
+init -1 python:
+    def add_tired_or_jump(label):
+        global TIRED, TIRED_LIMIT
+        TIRED += 1
+        if TIRED >= TIRED_LIMIT:
+            renpy.jump(label)
+
+    def reset_susp():
+        global TIRED
+        TIRED = 0

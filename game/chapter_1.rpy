@@ -4,6 +4,7 @@ define b = Character("Security B", kind=foreigner)
 default died_already = False
 default died_from_susp_already = False
 default died_twice_already = False
+default use_skip = False
 
 label start:
 
@@ -64,10 +65,6 @@ menu:
   "Regulations are important" if word_is_known("regulations", "are", "important"):
     b "See."
     $ reduce_susp()
-    # is susp > 0:
-   #   $ susp -= 1
-   # else susp = 0:
-    #  pass
     
   # только после того, как все эти слова будут изучены. Минус к подозрению. продолжается как обычно
 
@@ -79,15 +76,14 @@ b "Not only we should go inside only in odd numbers, but also more than two."
 b "Neither stay back or leap forward for more than one meter."
 b "But also make sure to not touch one another or me."
 
-if word_is_known("got", "it"):
-  menu:
+menu:
   # появляется только если слова из третьего известны
-    "...":
-      $ add_susp_or_jump("you_died_1")
-    "Fascinating.": # язык игрока
-      jump you_died_1
-    "Got it.":
-      pass
+  "...":
+    $ add_susp_or_jump("you_died_1")
+  "Fascinating.": # язык игрока
+    jump you_died_1
+  "Got it." if word_is_known("got", "it"):
+    pass
 
 b "We also should always talk to each other."
 a "Talking would be less unbearable if either of you two was even remotely fun to be around."
@@ -136,7 +132,7 @@ menu:
   "The food they make is ok." if word_is_known("food", "make"):
     a "Your definition of ok is a very low quality."
     a "I should treat you to something good to raise your standards."
-    pass
+    $ reduce_susp()
 
 b "We're coming in."
 
@@ -150,11 +146,14 @@ label you_died_1:
 if not died_already: # здесь нужно сделать так. в первый раз игра прыгает на word_learning_1 (1 раз)
   $ died_already = True
   jump word_learning_1
-elif SUSP >= SUSP_LIMIT and not died_from_susp_already: # если смерть от высокого подозрения word_learning_susp (1 раз)
+elif SUSP >= SUSP_LIMIT and not died_from_susp_already and not use_skip: # если смерть от высокого подозрения word_learning_susp (1 раз)
   $ died_from_susp_already = True
   jump word_learning_susp
-elif SUSP < SUSP_LIMIT and not died_twice_already: # если смерть после word_learning_1 еоторая не susp word_learning_sc1 (1 раз)
+elif SUSP < SUSP_LIMIT and not died_twice_already and not use_skip: # если смерть после word_learning_1 еоторая не susp word_learning_sc1 (1 раз)
   $ died_twice_already = True
   jump word_learning_sc1
+elif not use_skip and died_from_susp_already and died_twice_already:
+  $ use_skip = True
+  jump skip_words
 else: # все остальные после - word_learning
   jump word_learning
