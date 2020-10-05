@@ -2,6 +2,45 @@
 
 KNOWN_WORD_MODIFIER = 100000
 REPLACEMENT_CHAR = u"\u2588" # It's a block character
+REPLACEMENTS = {
+    u"a": u"⁜⁖ℇ℥",
+    u"b": u"ↇ∃",
+    u"c": u"∆",
+    u"d": u"⊗",
+    u"e": u"⊕",
+    u"f": u"≼",
+    u"g": u"≫",
+    u"h": u"≣",
+    u"i": u"⋹⋕",
+    u"j": u"◪",
+    u"k": u"⊜",
+    u"l": u"≗",
+    u"m": u"☳",
+    u"n": u"⎋",
+    u"o": u"⊡⏅⎄⎒▦",
+    u"p": u"❉",
+    u"q": u"⟱",
+    u"r": u"⨄",
+    u"s": u"Ⱡ",
+    u"t": u"Ɒ",
+    u"u": u"⏂",
+    u"v": u"⮹",
+    u"w": u"⧕",
+    u"x": u"⥉",
+    u"y": u"⛤",
+    u"z": u"☷",
+    u"0": u"┐",
+    u"1": u"└",
+    u"2": u"├",
+    u"3": u"╙",
+    u"4": u"┋",
+    u"5": u"│",
+    u"6": u"┱",
+    u"7": u"⑄",
+    u"8": u"⑀",
+    u"9": u"⑊",
+    u"'": u"⑇",
+}
 
 class Token(object):
     STATE_INVISIBLE = 0
@@ -49,13 +88,20 @@ class WordToken(Token):
         n = self._token_list.vocabulary().get(self.text.lower(), 0)
         if n < KNOWN_WORD_MODIFIER:
             color = u""
-            if n == 1:
-                color = u"#ff0000"
-            elif n == 2:
-                color = u"#00ffff"
-            elif n >= 3:
-                color = u"#00a100"
-            visible_text = REPLACEMENT_CHAR * len(self.text)
+            if n >= 1:
+                color = u"#500050"
+            # elif n >= 2:
+            #     color = u"#00a100"
+            # elif n >= 3:
+            #     color = u"#00a100"
+            h = hash(self.text)
+            visible_text = ""
+            for c in self.text:
+                cand = REPLACEMENTS.get(c, "#")
+                if len(cand) == 1:
+                    visible_text += cand
+                else:
+                    visible_text += cand[h % len(cand)]
             if color:
                 return u"{color=%s}%s{/color}" % (color, visible_text)
             else:
@@ -145,7 +191,7 @@ class SpecialArticleToken(SpecialWordToken):
         next_word = self.next_word()
         next_vis = False
         if next_word:
-            next_vis = next_word.compute_state() >= STATE_VISIBLE
+            next_vis = next_word.compute_state() >= Token.STATE_VISIBLE
         if next_vis:
             return Token.STATE_VISIBLE
         return Token.STATE_INVISIBLE
@@ -234,9 +280,12 @@ class TokenList(object):
         def __len__(self):
             return len(self._s)
 
-    def __init__(self, text, vocabulary):
+    def __init__(self, text, who, vocabulary, examples):
         self._vocab = vocabulary
+        self._examples = examples
+        self._who = who
         self._tokens = []
+        self._text = text
         self._parse(text)
 
     def vocabulary(self):
@@ -332,13 +381,20 @@ class TokenList(object):
     
     def update_vocabulary(self):
         words = self.collect_words()
+        visible_text = self._text
         for w in words:
             word = w.lower()
             if word in self._vocab:
                 self._vocab[word] += 1
+                word_token = None
+                for tok in self._tokens:
+                    if type(tok) is WordToken and tok.text.lower() == word:
+                        word_token = tok
+                        break
+                if word_token:
+                    self._examples[word] = (word, word_token.visualize(), self._who, visible_text)
             else:
                 self._vocab[word] = 1
 
     def visualize(self):
         return u"".join([t.visualize() for t in self._tokens])
-

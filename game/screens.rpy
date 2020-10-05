@@ -97,8 +97,8 @@ style frame:
 
 screen say(who, what):
     style_prefix "say"
-
     window:
+        #at trans_say_screen
         id "window"
 
         if who is not None:
@@ -116,12 +116,19 @@ screen say(who, what):
     if not renpy.variant("small"):
         add SideImage() xalign 0.0 yalign 1.0
 
+transform trans_say_screen:
+    on show:
+        alpha 0.0
+        linear 0.2 alpha 1.0
+    on hide:
+        alpha 1.0
+        linear 0.2 alpha 0.0
 
 ## Make the namebox available for styling through the Character object.
 init python:
     config.character_id_prefixes.append('namebox')
 
-style window is default
+# style window is default
 style say_label is default
 style say_dialogue is default
 style say_thought is say_dialogue
@@ -135,8 +142,8 @@ style window:
     xfill True
     yalign gui.textbox_yalign
     ysize gui.textbox_height
-
     background Image("gui/textbox.png", xalign=0.5, yalign=1.0)
+    
 
 style namebox:
     xpos gui.name_xpos
@@ -204,36 +211,94 @@ style input:
 ##
 ## https://www.renpy.org/doc/html/screen_special.html#choice
 
+init python:
+    def pair_items(items):
+        """ Breaks list of items into list of 2-item rows with enumerating style id """
+        if len(items) == 0:
+            return []
+        elif len(items) == 1:
+            return [[(items[0], 0)]]
+        else:
+            rv = []
+            style_id = 0
+            row = []
+            for i in xrange(len(items)):
+                if not items[i].action:
+                    if row:
+                        rv.append(row)
+                        row = []
+                    rv.append([(items[i], 0)])
+                else:
+                    row.append((items[i], style_id))
+                    style_id = (style_id + 1) % 4
+                    if len(row) == 2:
+                        rv.append(row)
+                        row = []
+            if row:
+                rv.append(row)
+            return rv
+
+
 screen choice(items):
     style_prefix "choice"
-
     vbox:
-        for i in items:
-            textbutton i.caption action i.action
-
+        for row in pair_items(items):
+            if len(row) == 1:
+                if row[0][0].action:
+                    textbutton row[0][0].caption action row[0][0].action style "choice_button_" + str(row[0][1])
+                else:
+                    text row[0][0].caption
+            else:
+                hbox:
+                    for item in row:
+                        textbutton item[0].caption action item[0].action style "choice_button_" + str(item[1])
 
 ## When this is true, menu captions will be spoken by the narrator. When false,
 ## menu captions will be displayed as empty buttons.
 define config.narrator_menu = True
 
-
-style choice_vbox is vbox
-style choice_button is button
-style choice_button_text is button_text
-
-style choice_vbox:
+style choice_vbox is vbox:
     xalign 0.5
-    ypos 405
-    yanchor 0.5
+    yalign 1.0
+    yoffset -106
+    spacing 38
 
-    spacing gui.choice_spacing
+style choice_hbox is hbox:
+    xalign 0.5
+    yalign 1.0
+    spacing 76
 
-style choice_button is default:
-    properties gui.button_properties("choice_button")
+style choice_button is button:
+    xsize 708
+    ysize 144
+    xalign 0.5
+    yalign 0.5
 
-style choice_button_text is default:
-    properties gui.button_text_properties("choice_button")
+style choice_button_0 is choice_button:
+    background Image("gui/answer_button_idle.png")
+    hover_background Image("gui/answer_button_hover.png")
 
+style choice_button_1 is choice_button:
+    background im.Flip("gui/answer_button_idle.png", horizontal=True, vertical=True)
+    hover_background im.Flip("gui/answer_button_hover.png", horizontal=True, vertical=True)
+
+style choice_button_2 is choice_button:
+    background im.Flip("gui/answer_button_idle.png", horizontal=True, vertical=False)
+    hover_background im.Flip("gui/answer_button_hover.png", horizontal=True, vertical=False)
+
+style choice_button_3 is choice_button:
+    background im.Flip("gui/answer_button_idle.png", horizontal=False, vertical=True)
+    hover_background im.Flip("gui/answer_button_hover.png", horizontal=False, vertical=True)
+
+style choice_button_text is button_text:
+    xalign 0.5
+    yalign 0.5
+    size 46
+    color "#000000"
+style choice_button_0_text is choice_button_text
+style choice_button_1_text is choice_button_text
+style choice_button_2_text is choice_button_text
+style choice_button_3_text is choice_button_text
 
 ## Quick Menu screen ###########################################################
 ##
@@ -246,22 +311,85 @@ screen quick_menu():
     zorder 100
 
     if quick_menu:
+        if red_quick_menu:
+            window:
+                style "quick_red"
+                hbox:
+                    style_prefix "quick"
+                    spacing 4
+                    button action Skip() alternate Skip(fast=True, confirm=True):
+                        style "quick_skip_button_red"
+                        text _("Skip")
+                    button action ShowMenu("history"):
+                        style "quick_history_button_red"
+                        text _("History")
+                    button action ShowMenu('preferences'):
+                        style "quick_options_button_red"
+                        text _("Options")
+                    button action ShowMenu("save"):
+                        style "quick_menu_button_red"
+                        text _("Menu")
+        else:
+            window:
+                style "quick_blue"
+                hbox:
+                    style_prefix "quick"
+                    spacing 4
+                    button action Skip() alternate Skip(fast=True, confirm=True):
+                        style "quick_skip_button"
+                        text _("Skip")
+                    button action ShowMenu("history"):
+                        style "quick_history_button"
+                        text _("History")
+                    button action ShowMenu('preferences'):
+                        style "quick_options_button"
+                        text _("Options")
+                    button action ShowMenu("save"):
+                        style "quick_menu_button"
+                        text _("Menu")
 
-        hbox:
-            style_prefix "quick"
+style quick:
+    xalign 1.0
+    yalign 1.0
+    yoffset -45
+    xoffset -234
 
-            xalign 0.5
-            yalign 1.0
+style quick_blue is quick:
+    background "gui/quick_bg_blue.png"
 
-            textbutton _("Back") action Rollback()
-            textbutton _("History") action ShowMenu('history')
-            textbutton _("Skip") action Skip() alternate Skip(fast=True, confirm=True)
-            textbutton _("Auto") action Preference("auto-forward", "toggle")
-            textbutton _("Save") action ShowMenu('save')
-            textbutton _("Q.Save") action QuickSave()
-            textbutton _("Q.Load") action QuickLoad()
-            textbutton _("Prefs") action ShowMenu('preferences')
+style quick_red is quick:
+    background "gui/quick_bg_red.png"
 
+style quick_text:
+    size 33
+    color "#000000"
+    xalign 0.5
+    yalign 0.5
+
+style quick_skip_button:
+    left_padding 27
+    xsize 182 ysize 51
+    hover_background "gui/quick_hover_1_blue.png"
+
+style quick_skip_button_red is quick_skip_button:
+    hover_background "gui/quick_hover_1_red.png"
+
+style quick_history_button:
+    xsize 198 ysize 51
+    hover_background "gui/quick_hover_2_blue.png"
+
+style quick_history_button_red is quick_history_button:
+    hover_background "gui/quick_hover_2_red.png"
+
+style quick_options_button is quick_history_button
+style quick_options_button_red is quick_history_button_red
+
+style quick_menu_button:
+    xsize 177 ysize 51
+    hover_background "gui/quick_hover_4_blue.png"
+
+style quick_menu_button_red is quick_menu_button:
+    hover_background "gui/quick_hover_4_red.png"
 
 ## This code ensures that the quick_menu screen is displayed in-game, whenever
 ## the player has not explicitly hidden the interface.
@@ -269,6 +397,7 @@ init python:
     config.overlay_screens.append("quick_menu")
 
 default quick_menu = True
+default red_quick_menu = False
 
 style quick_button is default
 style quick_button_text is button_text

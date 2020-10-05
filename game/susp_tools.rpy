@@ -17,7 +17,9 @@ init -1 python:
     
     def reset_susp():
         global SUSP
-        SUSP = 0
+        print "SUSP is", SUSP
+        SUSP -= SUSP
+        print "Reset SUSP to", SUSP
 
 
 init -1:
