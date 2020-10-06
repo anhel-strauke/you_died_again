@@ -36,7 +36,7 @@ label canteen:
       a "No reaction aganin?"
       show a_2
       a "You're somehow off, you know that?"
-	show a_1
+	  show a_1
       a "Whatever."
     "That's what?": # язык игрока
       jump you_died_5
