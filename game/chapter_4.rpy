@@ -174,8 +174,8 @@ label ending_1:
   b_cl "Your cognition is from another place and there might be slight differences."
   y "...huh."
   a_cl "Eat for now. It's over anyway."
-
-  "Ending one: free at last."
+  
+  scene ending1 with fade
 
   return 
 
@@ -188,9 +188,9 @@ label ending_2:
   "I don't want to check if I'll be revived."
   "I've died enough times for today."
   "And for my life."
-
-  "Ending two: better keep silent."
-
+  
+  scene ending2 with fade
+  
   return
 
 
@@ -198,6 +198,7 @@ label you_died_5:
   scene vn_ld_canteen
   show a_3
   v "Really, right in front of my salad?"
+  
   scene deathending with fade
 
   if not seen_ch4:
